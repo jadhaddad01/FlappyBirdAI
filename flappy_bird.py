@@ -1,3 +1,36 @@
+# coding=utf-8
+"""
+Author: Jad Haddad
+
+flappy_bird
+https://github.com/jadhaddad01/FlappyBirdAI
+Flappy Bird Artificial Intelligence
+Using the NEAT Genetic Neural Network Architecture to train a set of birds to play the popular game Flappy Bird. Also playable by user.
+
+License:
+-------------------------------------------------------------------------------
+The MIT License (MIT)
+Copyright 2017-2020 Pablo Pizarro R. @ppizarror
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-------------------------------------------------------------------------------
+"""
+
+# -----------------------------------------------------------------------------
+# Import libraries
+# -----------------------------------------------------------------------------
 import pygame
 import neat
 import time
@@ -7,10 +40,19 @@ import pygame_menu
 from utils import UI, visualize, confmodif
 import pickle
 from PIL import Image
+
+# -----------------------------------------------------------------------------
+# Pygame and font initialization
+# -----------------------------------------------------------------------------
+pygame.init()
 pygame.font.init()
 
+# -----------------------------------------------------------------------------
+# Constants and global variables
+# -----------------------------------------------------------------------------
 WIN_WIDTH = 500
 WIN_HEIGHT = 800
+FPS = 30
 
 win = UI.Window(WIN_WIDTH, WIN_HEIGHT)
 button2 = UI.Button(
@@ -33,7 +75,7 @@ gen = 0
 neural_net_image = None
 
 hs_genopt_popopt = [0, 5, 5] # Default
-with open(os.path.join("utils", "hs_genopt_popopt.txt"), "rb") as fp: # Unpickling
+with open(os.path.join("utils", "hs_genopt_popopt.txt"), "rb") as fp:			# Load Pickle
     hs_genopt_popopt = pickle.load(fp)
 
 BIRD_IMGS1 = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "1bird1.png"))),
@@ -58,6 +100,9 @@ BG_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bg.png
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 STAT_FONT_BIG = pygame.font.SysFont("comicsans", 100)
 
+# -----------------------------------------------------------------------------
+# Classes
+# -----------------------------------------------------------------------------
 class Bird:
 	random_color = random.randrange(1, 4) - 1
 	IMGS = BIRD_IMGS[random_color]
@@ -201,6 +246,9 @@ class Base:
 		win.blit(self.IMG, (self.x1, self.y))
 		win.blit(self.IMG, (self.x2, self.y))
 
+# -----------------------------------------------------------------------------
+# Methods
+# -----------------------------------------------------------------------------
 def draw_window_ai(win, birds, pipes, base, score, gen, birds_alive, genomes, config):
 	win.blit(BG_IMG, (0,0))
 
@@ -237,6 +285,7 @@ def draw_window_ai(win, birds, pipes, base, score, gen, birds_alive, genomes, co
 	pygame.display.update()
 
 def main_ai(genomes, config):
+	global FPS
 	global gen
 	gen += 1
 
@@ -283,7 +332,7 @@ def main_ai(genomes, config):
 		if button2.update():
 			menu()
 
-		clock.tick(30)
+		clock.tick(FPS)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				node_names = {0: 'Jump', -1: 'Bottom Pipe Height', -2: 'Top Pipe Height', -3: 'Bird Height'}
@@ -392,6 +441,7 @@ def draw_window_human(win, bird, pipes, base, score, pregame):
 	pygame.display.update()
 
 def main_human():
+	global FPS
 	global hs_genopt_popopt
 
 	bird = Bird(230, 350)
@@ -404,7 +454,7 @@ def main_human():
 
 	run_pregame = True
 	while run_pregame:
-		clock.tick(30)
+		clock.tick(FPS)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				run = False
@@ -420,11 +470,11 @@ def main_human():
 	bird.jump() # We just pressed space
 	run = True
 	while run:
-		clock.tick(30)
+		clock.tick(FPS)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				if(score > hs_genopt_popopt[0]):
-					with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:   #Pickling
+					with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:			# Save Pickle
 						pickle.dump(hs_genopt_popopt, fp)
 				run = False
 				pygame.quit()
@@ -465,7 +515,7 @@ def main_human():
 		if bird.y + bird.img.get_height() >= 730 or bird.y < 0:
 			if(score > hs_genopt_popopt[0]):
 				hs_genopt_popopt[0] = score
-				with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:   #Pickling
+				with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:			# Save Pickle
 					pickle.dump(hs_genopt_popopt, fp)
 			main_human()
 
@@ -475,84 +525,205 @@ def main_human():
 
 
 def run(config_path):
-	config = neat.config.Config(neat.DefaultGenome,
-								neat.DefaultReproduction,
-								neat.DefaultSpeciesSet,
-								neat.DefaultStagnation,
-								config_path)
+	"""
+    Use given configuration path and variables to start teaching the AI to play the game
+    Then visualize the data with the genome containing highest fitness
+    :param config_path: path to the neural 
+    :type config_path: int / range[0 -> 99]
+    :return: None
+    """
 
+    # Global Variables
+	global hs_genopt_popopt
+	global gen
+
+    # -------------------------------------------------------------------------
+    # Load Configuration
+    # -------------------------------------------------------------------------
+	config = neat.config.Config(
+		neat.DefaultGenome,
+		neat.DefaultReproduction,
+		neat.DefaultSpeciesSet,
+		neat.DefaultStagnation,
+		config_path
+	)
+
+	# Create Population
 	p = neat.Population(config)
 
+	# Add StdOut Reporter (Displays Progress in Terminal)
 	p.add_reporter(neat.StdOutReporter(True))
 	stats = neat.StatisticsReporter()
 	p.add_reporter(stats)
 
-	global hs_genopt_popopt
+	""" Save Population in Generation x
+	x = 3
+	p.add_reporter(neat.Checkpointer(x))
+	"""
+
+	# Handle Generation Count of 0
 	if hs_genopt_popopt[1] < 1:
 		print('Generations set to 1 instead of 0.')
 		hs_genopt_popopt[1] = 1
 
-	with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:   #Pickling
+	# Save HighScore Gen. Option and Pop. Option with Pickle
+	with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:			# Save Pickle
 		pickle.dump(hs_genopt_popopt, fp)
 
-	global gen
-	if gen == hs_genopt_popopt[1]: # If the bird finishes gen gens we reset the number
-		gen = 0
-	winner = p.run(main_ai, hs_genopt_popopt[1]) #We will run gen generations
+	# Run Up to [Gen. Option] Generations
+	winner = p.run(main_ai, hs_genopt_popopt[1]) # We Save Best Genome
 
+	# -------------------------------------------------------------------------
+    # Visualize Neural Network, Statistics, and Species
+    # -------------------------------------------------------------------------
 	node_names = {0: 'Jump', -1: 'Bottom Pipe Height', -2: 'Top Pipe Height', -3: 'Bird Height'}
-	visualize.draw_net(config, winner, False, fmt='png', filename='best_neural_net', node_names=node_names)
-	visualize.plot_stats(stats, ylog=False, view=False)
-	visualize.plot_species(stats, view=False)
+	visualize.draw_net(
+		config, 
+		winner, 
+		False, 
+		fmt='png', 
+		filename='best_neural_net', 
+		node_names=node_names
+	)
 
-def run_AI():
-	global gen
+	# Only Draw if More Than 1 Gen
+	if hs_genopt_popopt[1] > 1:
+		visualize.plot_stats(stats, ylog=False, view=False)
+		visualize.plot_species(stats, view=False)
+
+	""" Load and Run Saved Checkpoint
+	gen = x
+	p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-' + str(x - 1))
+	p.run(main_ai, 2)
+	"""
+
+	# Reset Gen Count
 	gen = 0
 
+def start_AI():
+	"""
+    Prepare the artificial intelligence by resetting and setting values and the configuration
+    :return: None
+    """
+
+    # Global Variable
 	global hs_genopt_popopt
 
+	# Handle Population Count Lower than 2
 	if hs_genopt_popopt[2] < 2:
 		print('Population set to 2. P.S: The NN needs at least 2 genomes to function properly.')
 		hs_genopt_popopt[2] = 2
 
+	# Modify NEAT Configuration File For Population Count
 	confmodif.conf_file_modify(hs_genopt_popopt[2])
 
+	# -------------------------------------------------------------------------
+    # Set and Run Configuration Path
+    # -------------------------------------------------------------------------
 	local_dir = os.path.dirname(__file__)
 	config_path = os.path.join(local_dir, os.path.join("utils", "config-feedforward.txt"))
 	run(config_path)
 
 def set_val_gen(value):
-    global hs_genopt_popopt
-    hs_genopt_popopt[1] = value
+	"""
+    Saving generation count from options menu
+    :param value: value to set
+    :type value: int / range[0 -> 99]
+    :return: None
+    """
+
+    # Global Variable
+	global hs_genopt_popopt
+    # Set Generation Count
+	hs_genopt_popopt[1] = value
 
 def set_val_pop(value):
-    global hs_genopt_popopt
-    hs_genopt_popopt[2] = value
+	"""
+    Saving population count from options menu
+    :param value: value to set
+    :type value: int / range[0 -> 99]
+    :return: None
+    """
+
+    # Global Variable
+	global hs_genopt_popopt
+    # Set Population Count
+	hs_genopt_popopt[2] = value
 
 def menu():
-	menu_theme = pygame_menu.themes.THEME_BLUE.copy()
-	menu_theme.widget_font = pygame_menu.font.FONT_8BIT
+	"""
+    Menu function, that displays the Main Menu and the AI Options Menu.
+    :return: None
+    """
 
-	options = pygame_menu.Menu(800, 500, 'AI Options', onclose=pygame_menu.events.EXIT,
-                       theme=menu_theme)
-
+	# Global Variables
 	global hs_genopt_popopt
+	global FPS
+
+	# Menu Theme
+	menu_theme = pygame_menu.themes.THEME_BLUE.copy()
+	menu_theme.widget_font = pygame_menu.font.FONT_8BIT # Copy of blue theme with 8bit font instead
+
+	# No negative values allowed
 	valid_chars = ['1','2','3','4','5','6','7','8','9','0']
-	options.add_text_input('Generations : ', default=str(hs_genopt_popopt[1]), input_type=pygame_menu.locals.INPUT_INT, valid_chars=valid_chars , maxchar=2, onchange=set_val_gen)
-	valid_chars = ['1','2','3','4','5','6','7','8','9','0']
-	options.add_text_input('Population : ', default=str(hs_genopt_popopt[2]), input_type=pygame_menu.locals.INPUT_INT, valid_chars=valid_chars ,maxchar=2, onchange=set_val_pop)
+
+	# -------------------------------------------------------------------------
+    # Create menus: AI Options menu
+    # -------------------------------------------------------------------------
+	options = pygame_menu.Menu(
+		800, # Height
+		500, #Width
+		'AI Options',
+		onclose=pygame_menu.events.EXIT, # Menu close button or ESC pressed
+		theme=menu_theme # Theme
+	)
+	# Integer Inputs
+	options.add_text_input(
+		'Generations : ',
+		default=str(hs_genopt_popopt[1]), # Default number set to gen input of previous AI game
+		input_type=pygame_menu.locals.INPUT_INT, # Integer inputs only
+		valid_chars=valid_chars,
+		maxchar=2,
+		onchange=set_val_gen # Save input
+	)
+	options.add_text_input('Population : ', 
+		default=str(hs_genopt_popopt[2]), 
+		input_type=pygame_menu.locals.INPUT_INT, 
+		valid_chars=valid_chars, 
+		maxchar=2, 
+		onchange=set_val_pop
+	)
+	# Back Button
 	options.add_button('Back', pygame_menu.events.BACK)
 
-	menu = pygame_menu.Menu(800, 500, 'Flappy Bird', theme=menu_theme, onclose=pygame_menu.events.EXIT)
-	menu.add_button('AI', run_AI)
+	# -------------------------------------------------------------------------
+    # Create menus: Main menu
+    # -------------------------------------------------------------------------
+	menu = pygame_menu.Menu(
+		800, 
+		500, 
+		'Flappy Bird', 
+		theme=menu_theme, 
+		onclose=pygame_menu.events.EXIT
+	)
+	# Play Buttons
+	menu.add_button('AI', start_AI)
 	menu.add_button('YOU', main_human)
+	# Spacing
 	menu.add_label('')
 	menu.add_label('')
 	menu.add_label('')
 	menu.add_label('')
+	# Options and Quit
 	menu.add_button('AI Options', options)
 	menu.add_button('Quit', pygame_menu.events.EXIT)
-	menu.mainloop(win, fps_limit=30)
 
+	# Main Menu Loop
+	menu.mainloop(win, fps_limit=FPS)
+
+# -----------------------------------------------------------------------------
+# Main Program
+# -----------------------------------------------------------------------------
 if __name__== "__main__":
+	# Run Menu
 	menu()
