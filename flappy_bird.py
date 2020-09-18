@@ -28,16 +28,13 @@ button2 = UI.Button(
     }
 )
 
-gen_option = 5
-pop_option = 5
-
 gen = 0
-high_score = 0
 
 neural_net_image = None
 
-with open(os.path.join("utils", "highscore.txt"), "rb") as fp: # Unpickling
-    high_score = pickle.load(fp)
+hs_genopt_popopt = [0, 5, 5] # Default
+with open(os.path.join("utils", "hs_genopt_popopt.txt"), "rb") as fp: # Unpickling
+    hs_genopt_popopt = pickle.load(fp)
 
 BIRD_IMGS1 = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "1bird1.png"))),
              pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "1bird2.png"))),
@@ -385,8 +382,8 @@ def draw_window_human(win, bird, pipes, base, score, pregame):
 		text = STAT_FONT_BIG.render("Press Space", 1, (255, 255, 255))
 		win.blit(text, (WIN_WIDTH/2- text.get_width()/2, WIN_HEIGHT/2))
 
-		global high_score
-		text = STAT_FONT.render("High Score: " + str(high_score), 1, (255, 0, 0))
+		global hs_genopt_popopt
+		text = STAT_FONT.render("High Score: " + str(hs_genopt_popopt[0]), 1, (255, 0, 0))
 		win.blit(text, (WIN_WIDTH/2- text.get_width()/2, WIN_HEIGHT/2 + 100))
 
 	if button2.update():
@@ -395,7 +392,7 @@ def draw_window_human(win, bird, pipes, base, score, pregame):
 	pygame.display.update()
 
 def main_human():
-	global high_score
+	global hs_genopt_popopt
 
 	bird = Bird(230, 350)
 	base = Base(730)
@@ -426,9 +423,9 @@ def main_human():
 		clock.tick(30)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				if(score > high_score):
-					with open(os.path.join("utils", "highscore.txt"), "wb") as fp:   #Pickling
-						pickle.dump(high_score, fp)
+				if(score > hs_genopt_popopt[0]):
+					with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:   #Pickling
+						pickle.dump(hs_genopt_popopt, fp)
 				run = False
 				pygame.quit()
 				quit()
@@ -442,8 +439,8 @@ def main_human():
 		rem = []
 		for pipe in pipes:
 			if pipe.collide(bird):
-				if(score > high_score):
-					high_score = score
+				if(score > hs_genopt_popopt[0]):
+					hs_genopt_popopt[0] = score
 				main_human()
 
 			if pipe.x + pipe.PIPE_TOP.get_width() < 0:
@@ -466,10 +463,10 @@ def main_human():
 			pipes.remove(r)
 
 		if bird.y + bird.img.get_height() >= 730 or bird.y < 0:
-			if(score > high_score):
-				high_score = score
-				with open(os.path.join("utils", "highscore.txt"), "wb") as fp:   #Pickling
-					pickle.dump(high_score, fp)
+			if(score > hs_genopt_popopt[0]):
+				hs_genopt_popopt[0] = score
+				with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:   #Pickling
+					pickle.dump(hs_genopt_popopt, fp)
 			main_human()
 
 		base.move()
@@ -490,15 +487,18 @@ def run(config_path):
 	stats = neat.StatisticsReporter()
 	p.add_reporter(stats)
 
-	global gen_option
-	if gen_option < 1:
+	global hs_genopt_popopt
+	if hs_genopt_popopt[1] < 1:
 		print('Generations set to 1 instead of 0.')
-		gen_option = 1
+		hs_genopt_popopt[1] = 1
+
+	with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:   #Pickling
+		pickle.dump(hs_genopt_popopt, fp)
 
 	global gen
-	if gen == gen_option: # If the bird finishes 200 gens we reset the number
+	if gen == hs_genopt_popopt[1]: # If the bird finishes gen gens we reset the number
 		gen = 0
-	winner = p.run(main_ai, gen_option) #We will run 200 generations
+	winner = p.run(main_ai, hs_genopt_popopt[1]) #We will run gen generations
 
 	node_names = {0: 'Jump', -1: 'Bottom Pipe Height', -2: 'Top Pipe Height', -3: 'Bird Height'}
 	visualize.draw_net(config, winner, False, fmt='png', filename='best_neural_net', node_names=node_names)
@@ -509,25 +509,25 @@ def run_AI():
 	global gen
 	gen = 0
 
-	global pop_option
+	global hs_genopt_popopt
 
-	if pop_option < 2:
+	if hs_genopt_popopt[2] < 2:
 		print('Population set to 2. P.S: The NN needs at least 2 genomes to function properly.')
-		pop_option = 2
+		hs_genopt_popopt[2] = 2
 
-	confmodif.conf_file_modify(pop_option)
+	confmodif.conf_file_modify(hs_genopt_popopt[2])
 
 	local_dir = os.path.dirname(__file__)
 	config_path = os.path.join(local_dir, os.path.join("utils", "config-feedforward.txt"))
 	run(config_path)
 
 def set_val_gen(value):
-    global gen_option
-    gen_option = value
+    global hs_genopt_popopt
+    hs_genopt_popopt[1] = value
 
 def set_val_pop(value):
-    global pop_option
-    pop_option = value
+    global hs_genopt_popopt
+    hs_genopt_popopt[2] = value
 
 def menu():
 	menu_theme = pygame_menu.themes.THEME_BLUE.copy()
@@ -535,10 +535,12 @@ def menu():
 
 	options = pygame_menu.Menu(800, 500, 'AI Options', onclose=pygame_menu.events.EXIT,
                        theme=menu_theme)
+
+	global hs_genopt_popopt
 	valid_chars = ['1','2','3','4','5','6','7','8','9','0']
-	options.add_text_input('Generations : ', default='5', input_type=pygame_menu.locals.INPUT_INT, valid_chars=valid_chars , maxchar=2, onchange=set_val_gen)
+	options.add_text_input('Generations : ', default=str(hs_genopt_popopt[1]), input_type=pygame_menu.locals.INPUT_INT, valid_chars=valid_chars , maxchar=2, onchange=set_val_gen)
 	valid_chars = ['1','2','3','4','5','6','7','8','9','0']
-	options.add_text_input('Population : ', default='5', input_type=pygame_menu.locals.INPUT_INT, valid_chars=valid_chars ,maxchar=2, onchange=set_val_pop)
+	options.add_text_input('Population : ', default=str(hs_genopt_popopt[2]), input_type=pygame_menu.locals.INPUT_INT, valid_chars=valid_chars ,maxchar=2, onchange=set_val_pop)
 	options.add_button('Back', pygame_menu.events.BACK)
 
 	menu = pygame_menu.Menu(800, 500, 'Flappy Bird', theme=menu_theme, onclose=pygame_menu.events.EXIT)
