@@ -31,15 +31,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # -----------------------------------------------------------------------------
 # Import libraries
 # -----------------------------------------------------------------------------
+# Public Libraries
 import pygame
 import neat
 import time
 import os
 import random
 import pygame_menu
-from utils import UI, visualize, confmodif
 import pickle
 from PIL import Image
+# Utils Folder files
+from utils import UI, visualize, confmodif
 
 # -----------------------------------------------------------------------------
 # Pygame and font initialization
@@ -54,10 +56,11 @@ WIN_WIDTH = 500
 WIN_HEIGHT = 800
 FPS = 30
 
+# Load Window and Menu Button
 win = UI.Window(WIN_WIDTH, WIN_HEIGHT)
 button2 = UI.Button(
-    x = 500 - 10 - 120,
-    y = 50,
+    x = 500 - 10 - 120, # Top right under score count (SEE DISPLAY FUNCTIONS)
+    y = 50, 
     w = 120,
     h = 35,
     param_options={
@@ -70,14 +73,31 @@ button2 = UI.Button(
     }
 )
 
+# Generation Count and Image Display
 gen = 0
-
 neural_net_image = None
 
-hs_genopt_popopt = [0, 5, 5] # Default
-with open(os.path.join("utils", "hs_genopt_popopt.txt"), "rb") as fp:			# Load Pickle
-    hs_genopt_popopt = pickle.load(fp)
+# To Save Human High Score, AI Options Gen. / Pop.
+hs_genopt_popopt = [0, 5, 5] # Default if file not found
 
+# Open hs_genopt_popopt File
+try:
+	with open(os.path.join("utils", "hs_genopt_popopt.txt"), "rb") as fp:			# Load Pickle
+		hs_genopt_popopt = pickle.load(fp)
+# If Not Found, Create a New One
+except Exception as e:
+	print("Saved Values File hs_genopt_popopt.txt Not Found. Defaulting to:")
+	print("	- High Score:", hs_genopt_popopt[0])
+	print("	- Generations (AI Options):", hs_genopt_popopt[1])
+	print("	- Population (AI Options):", hs_genopt_popopt[2])
+
+	with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:			# Save Pickle
+		pickle.dump(hs_genopt_popopt, fp)
+
+
+# -----------------------------------------------------------------------------
+# Load Sprite Images
+# -----------------------------------------------------------------------------
 BIRD_IMGS1 = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "1bird1.png"))),
              pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "1bird2.png"))),
              pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "1bird3.png")))]
@@ -97,6 +117,7 @@ PIPE_IMGS = [PIPE_IMG1, PIPE_IMG2]
 BASE_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "base.png")))
 BG_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bg.png")))
 
+# Load Fonts
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 STAT_FONT_BIG = pygame.font.SysFont("comicsans", 100)
 
@@ -250,45 +271,105 @@ class Base:
 # Methods
 # -----------------------------------------------------------------------------
 def draw_window_ai(win, birds, pipes, base, score, gen, birds_alive, genomes, config):
+	"""
+	Draw game using given parameters (AI Game)
+
+	:param win: window to draw on
+	:type win: UI.Window
+
+	:param birds: bird to draw
+	:type birds: Bird[]
+
+	:param pipes: pipes to draw
+	:type pipes: Pipe[]
+
+	:param base: base to draw
+	:type base: Base
+
+	:param score: score to draw
+	:type score: int [0 -> infiniti]
+
+	:param gen: generations to draw
+	:type gen: int [1 -> 99]
+
+	:param birds_alive: draw how many birds are alive
+	:type birds_alive: int [1 -> 99]
+
+	:param genomes: visualize neural net when menu button is pressed
+	:type genomes: neat.Population[]
+
+	:param config: visualize neural net when menu button is pressed
+	:type config: neat.ConfigParameter
+
+	:return: None
+	"""
+	# Draw Background
 	win.blit(BG_IMG, (0,0))
 
+	# Draw All Pipes
 	for pipe in pipes:
 		pipe.draw(win)
 
+	# Draw Current Score
 	text = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
 	win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
 
+	# Draw Current Generation
 	text = STAT_FONT.render("Gen: " + str(gen), 1, (255, 255, 255))
 	win.blit(text, (10, 10))
 
+	# Draw Current Number of Birds Alive
 	text = STAT_FONT.render("Alive: " + str(birds_alive), 1, (255, 255, 255))
 	win.blit(text, (10, 50))
 
+	# Return To Menu if Menu Button Pressed
 	if button2.update():
+		# Save last iteration
 		node_names = {0: 'Jump', -1: 'Bottom Pipe Height', -2: 'Top Pipe Height', -3: 'Bird Height'}
-		visualize.draw_net(config, genomes[0][1], False, fmt='png', filename='best_neural_net', node_names=node_names) # Save last iteration
+		visualize.draw_net(config, genomes[0][1], False, fmt='png', filename='best_neural_net', node_names=node_names)
+		
+		# Remove Special Vis Files
 		try:
 			os.remove('speciation.svg')
 			os.remove('avg_fitness.svg')
 		except Exception as e:
 			pass
 		
+		# Go Back To Menu
 		menu()
 
+	# Draw Base and Birds
 	base.draw(win)
-
 	for bird in birds:
 		bird.draw(win)
 
+	# Draw Neural Network
 	win.blit(neural_net_image, (10, WIN_HEIGHT - 70 - neural_net_image.get_height())) # 70 accounts for base
 	
+	# Update the Current Display
 	pygame.display.update()
 
 def main_ai(genomes, config):
+	"""
+	Play game for AI
+
+	:param genomes: use different neural networks to play the game
+	:type genomes: neat.Population[]
+
+	:param config: use different neural networks to play the game
+	:type config: neat.ConfigParameter
+
+	:return: None
+	"""
+
+	# Global Variables
 	global FPS
 	global gen
-	gen += 1
-
+	global neural_net_image
+	
+	# -------------------------------------------------------------------------
+	# AI Systen: Neural Network Display
+	# -------------------------------------------------------------------------
 	node_names = {0: 'Jump', -1: 'Bottom P', -2: 'Top P', -3: 'Bird'}
 	visualize.draw_net(config, genomes[0][1], False, fmt='png', filename='best_neural_net', node_names=node_names) # We take the first genome as we can only visualize one neural net
 	
@@ -296,6 +377,7 @@ def main_ai(genomes, config):
 	img = img.convert("RGBA")
 	datas = img.getdata()
 
+	# Remove White Pixels (Background)
 	newData = []
 	for item in datas:
 	    if item[0] == 255 and item[1] == 255 and item[2] == 255:
@@ -306,13 +388,13 @@ def main_ai(genomes, config):
 	img.putdata(newData)
 	img.save("best_neural_net.png", "PNG")
 	
-	global neural_net_image
+	# To Display is Ready
 	neural_net_image = pygame.image.load('best_neural_net.png') 
 
+	# Set Birds "Connected" To Its Genome and NN
 	nets = []
 	ge = []
 	birds = []
-	
 	for _, g in genomes:
 		net = neat.nn.FeedForwardNetwork.create(g, config)
 		nets.append(net)
@@ -320,29 +402,36 @@ def main_ai(genomes, config):
 		g.fitness = 0
 		ge.append(g)
 
+	# Set Variables
 	base = Base(730)
 	pipes = [Pipe(600)]
 	win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 	clock = pygame.time.Clock()
 
+	# Reset Score and Add One Gen
 	score = 0
+	gen += 1
 
+	# -------------------------------------------------------------------------
+	# Game: Main Game
+	# -------------------------------------------------------------------------
 	run = True
 	while run:
-		if button2.update():
-			menu()
-
-		clock.tick(FPS)
+		clock.tick(FPS) # Allow only for FPS Frames per Second
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
+				# Save last iteration
 				node_names = {0: 'Jump', -1: 'Bottom Pipe Height', -2: 'Top Pipe Height', -3: 'Bird Height'}
 				visualize.draw_net(config, genomes[0][1], False, fmt='png', filename='best_neural_net', node_names=node_names) # Save last iteration
+				
+				# Remove Special Vis Files
 				try:
 					os.remove('speciation.svg')
 					os.remove('avg_fitness.svg')
 				except Exception as e:
 					pass
 				run = False
+
 				pygame.quit()
 				quit()
 
@@ -355,19 +444,28 @@ def main_ai(genomes, config):
 			run = False
 			break
 
+		# -------------------------------------------------------------------------
+		# AI Systen: Bird Jump
+		# -------------------------------------------------------------------------
 		for x, bird in enumerate(birds):
-			bird.move()
+			bird.move() # Move each bird
 			ge[x].fitness += 0.1
 
+			# Inputs: Bird Height, Top Pipe Height, Bottom Pipe Height
 			outputs = nets[x].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
 
+			# TanH Function | y > 0.5
 			if outputs[0] > 0.5:
 				bird.jump()
 
+		# -------------------------------------------------------------------------
+		# System: Pipes
+		# -------------------------------------------------------------------------
 		add_pipe = False
 		rem = []
 		for pipe in pipes:
 			for x, bird in enumerate(birds):
+				# Bird / Pipe Collision
 				if pipe.collide(bird):
 					ge[x].fitness -= 2
 					birds.pop(x)
@@ -378,14 +476,16 @@ def main_ai(genomes, config):
 					pipe.passed = True
 					add_pipe = True
 
+			# Pipe Outside Screen
 			if pipe.x + pipe.PIPE_TOP.get_width() < 0:
 				rem.append(pipe)
 			
-			
+			# Move Pipes
 			pipe.move()
 		
+		# Add New Pipe and 1 to Score
 		if add_pipe:
-			score += 1
+			score += 1 # All birds have same x pos
 
 			if score == 50:
 				print("Perfect bird out here")
@@ -395,9 +495,13 @@ def main_ai(genomes, config):
 			
 			pipes.append(Pipe(600))
 
+		# Remove Outside Pipes To Not Render Them
 		for r in rem:
 			pipes.remove(r)
 
+		# -------------------------------------------------------------------------
+		# System: Base / Top Collision
+		# -------------------------------------------------------------------------
 		for x, bird in enumerate(birds):
 			if bird.y + bird.img.get_height() >= 730 or bird.y < 0:
 				ge[x].fitness -= 2
@@ -405,74 +509,132 @@ def main_ai(genomes, config):
 				nets.pop(x)
 				ge.pop(x)
 
+		# Animate Base
 		base.move()
 		
+		# -------------------------------------------------------------------------
+		# Draw To Screen
+		# -------------------------------------------------------------------------
 		draw_window_ai(win, birds, pipes, base, score, gen, len(birds), genomes, config)
 
 def draw_window_human(win, bird, pipes, base, score, pregame):
+	"""
+	Draw game using given parameters (Human Game)
+	Can draw both pregame and main game
+
+	:param win: window to draw on
+	:type win: UI.Window
+
+	:param bird: bird to draw
+	:type bird: Bird
+
+	:param pipes: pipes to draw
+	:type pipes: Pipe[]
+
+	:param base: base to draw
+	:type base: Base
+
+	:param score: score to draw
+	:type score: int [0 -> infiniti]
+
+	:param pregame: distinguish drawing the pregame or the main game
+	:type pregame: bool
+
+	:return: None
+	"""
+
+	# Draw Background
 	win.blit(BG_IMG, (0,0))
 
+	# Draw All Pipes
 	for pipe in pipes:
 		pipe.draw(win)
 
+	# Draw Current Score
 	text = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
 	win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
 
+	# Draw Base and Bird
 	base.draw(win)
-
 	bird.draw(win)
 
+	# -------------------------------------------------------------------------
+	# Extra Draw For Pregame
+	# -------------------------------------------------------------------------
 	if pregame:
+		# Draw Transparency Over Base and Bird
 		transparency_size = (500, 800)
 		transparency = pygame.Surface(transparency_size)
 		transparency.set_alpha(150)
 		win.blit(transparency, (0,0))
 
+		# Main Text
 		text = STAT_FONT_BIG.render("Press Space", 1, (255, 255, 255))
 		win.blit(text, (WIN_WIDTH/2- text.get_width()/2, WIN_HEIGHT/2))
 
-		global hs_genopt_popopt
+		# Saved High Score
 		text = STAT_FONT.render("High Score: " + str(hs_genopt_popopt[0]), 1, (255, 0, 0))
 		win.blit(text, (WIN_WIDTH/2- text.get_width()/2, WIN_HEIGHT/2 + 100))
 
+	# Return To Menu if Menu Button Pressed
 	if button2.update():
 		menu()
 
+	# Update the Current Display
 	pygame.display.update()
 
 def main_human():
+	"""
+	Play game for user
+
+	:return: None
+	"""
+
+	# Global Variables
 	global FPS
 	global hs_genopt_popopt
 
+	# Set Variables
 	bird = Bird(230, 350)
 	base = Base(730)
 	pipes = [Pipe(600)]
 	win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 	clock = pygame.time.Clock()
 
-	score = 0
+	# Reset Score
+	score = 0 
 
+	# -------------------------------------------------------------------------
+	# Game: Before the Game
+	# -------------------------------------------------------------------------
 	run_pregame = True
 	while run_pregame:
-		clock.tick(FPS)
+		clock.tick(FPS) # Allow only for FPS Frames per Second
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				run = False
 				pygame.quit()
 				quit()
 		keys = pygame.key.get_pressed()
+		
+		# Start Game When Space is Pressed
 		if keys[pygame.K_SPACE]:
 			run_pregame = False
 
+		# Animate Base and Draw Everything To Screen
 		base.move()
 		draw_window_human(win, bird, pipes, base, score, True)
 
-	bird.jump() # We just pressed space
+	# -------------------------------------------------------------------------
+	# Game: Main Game
+	# -------------------------------------------------------------------------
+	bird.jump() # Since We Pressed Space
 	run = True
 	while run:
 		clock.tick(FPS)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
+				# Before Quitting, Save New HighScore [If New Highscore]
 				if(score > hs_genopt_popopt[0]):
 					with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:			# Save Pickle
 						pickle.dump(hs_genopt_popopt, fp)
@@ -480,27 +642,40 @@ def main_human():
 				pygame.quit()
 				quit()
 
+		# Change Bird Position
 		bird.move()
+
+		# Jump With Space
 		keys = pygame.key.get_pressed()
 		if keys[pygame.K_SPACE]:
 			bird.jump()
 
+		# -------------------------------------------------------------------------
+		# System: Pipes
+		# -------------------------------------------------------------------------
 		add_pipe = False
-		rem = []
+		outside_pipes = []
 		for pipe in pipes:
+			# Bird / Pipe Collision
 			if pipe.collide(bird):
 				if(score > hs_genopt_popopt[0]):
 					hs_genopt_popopt[0] = score
-				main_human()
+					with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:			# Save Pickle
+						pickle.dump(hs_genopt_popopt, fp)
+				main_human() # We Go 'Back' To PreGame
 
+			# Pipe Outside Screen
 			if pipe.x + pipe.PIPE_TOP.get_width() < 0:
-				rem.append(pipe)
+				outside_pipes.append(pipe)
 			
 			if not pipe.passed and pipe.x < bird.x:
 				pipe.passed = True
 				add_pipe = True
+
+			# Move Pipes
 			pipe.move()
 		
+		# Add New Pipe and 1 to Score
 		if add_pipe:
 			score += 1
 
@@ -509,37 +684,47 @@ def main_human():
 
 			pipes.append(Pipe(600))
 
-		for r in rem:
+		# Remove Outside Pipes To Not Render Them
+		for r in outside_pipes:
 			pipes.remove(r)
 
+		# -------------------------------------------------------------------------
+		# System: Base / Top Collision
+		# -------------------------------------------------------------------------
 		if bird.y + bird.img.get_height() >= 730 or bird.y < 0:
 			if(score > hs_genopt_popopt[0]):
 				hs_genopt_popopt[0] = score
 				with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:			# Save Pickle
 					pickle.dump(hs_genopt_popopt, fp)
-			main_human()
+			main_human() # We Go 'Back' To PreGame
 
+		# Animate Base
 		base.move()
 		
+		# -------------------------------------------------------------------------
+		# Draw To Screen
+		# -------------------------------------------------------------------------
 		draw_window_human(win, bird, pipes, base, score, False)
 
 
 def run(config_path):
 	"""
-    Use given configuration path and variables to start teaching the AI to play the game
-    Then visualize the data with the genome containing highest fitness
-    :param config_path: path to the neural 
-    :type config_path: int / range[0 -> 99]
-    :return: None
-    """
+	Use given configuration path and variables to start teaching the AI to play the game
+	Then visualize the data with the genome containing highest fitness
 
-    # Global Variables
+	:param config_path: path to the neural 
+	:type config_path: int / range[0 -> 99]
+
+	:return: None
+	"""
+
+	# Global Variables
 	global hs_genopt_popopt
 	global gen
 
-    # -------------------------------------------------------------------------
-    # Load Configuration
-    # -------------------------------------------------------------------------
+	# -------------------------------------------------------------------------
+	# Load Configuration
+	# -------------------------------------------------------------------------
 	config = neat.config.Config(
 		neat.DefaultGenome,
 		neat.DefaultReproduction,
@@ -574,8 +759,8 @@ def run(config_path):
 	winner = p.run(main_ai, hs_genopt_popopt[1]) # We Save Best Genome
 
 	# -------------------------------------------------------------------------
-    # Visualize Neural Network, Statistics, and Species
-    # -------------------------------------------------------------------------
+	# Visualize Neural Network, Statistics, and Species
+	# -------------------------------------------------------------------------
 	node_names = {0: 'Jump', -1: 'Bottom Pipe Height', -2: 'Top Pipe Height', -3: 'Bird Height'}
 	visualize.draw_net(
 		config, 
@@ -602,11 +787,11 @@ def run(config_path):
 
 def start_AI():
 	"""
-    Prepare the artificial intelligence by resetting and setting values and the configuration
-    :return: None
-    """
+	Prepare the artificial intelligence by resetting and setting values and the configuration
+	:return: None
+	"""
 
-    # Global Variable
+	# Global Variable
 	global hs_genopt_popopt
 
 	# Handle Population Count Lower than 2
@@ -618,43 +803,50 @@ def start_AI():
 	confmodif.conf_file_modify(hs_genopt_popopt[2])
 
 	# -------------------------------------------------------------------------
-    # Set and Run Configuration Path
-    # -------------------------------------------------------------------------
+	# Set and Run Configuration Path
+	# -------------------------------------------------------------------------
 	local_dir = os.path.dirname(__file__)
 	config_path = os.path.join(local_dir, os.path.join("utils", "config-feedforward.txt"))
 	run(config_path)
 
 def set_val_gen(value):
 	"""
-    Saving generation count from options menu
-    :param value: value to set
-    :type value: int / range[0 -> 99]
-    :return: None
-    """
+	Saving generation count from options menu
 
-    # Global Variable
+	:param value: value to set
+	:type value: int / range[0 -> 99]
+
+	:return: None
+	"""
+
+	# Global Variable
 	global hs_genopt_popopt
-    # Set Generation Count
+
+	# Set Generation Count
 	hs_genopt_popopt[1] = value
 
 def set_val_pop(value):
 	"""
-    Saving population count from options menu
-    :param value: value to set
-    :type value: int / range[0 -> 99]
-    :return: None
-    """
+	Saving population count from options menu
 
-    # Global Variable
+	:param value: value to set
+	:type value: int / range[0 -> 99]
+
+	:return: None
+	"""
+
+	# Global Variable
 	global hs_genopt_popopt
-    # Set Population Count
+
+	# Set Population Count
 	hs_genopt_popopt[2] = value
 
 def menu():
 	"""
-    Menu function, that displays the Main Menu and the AI Options Menu.
-    :return: None
-    """
+	Menu function, that displays the Main Menu and the AI Options Menu
+
+	:return: None
+	"""
 
 	# Global Variables
 	global hs_genopt_popopt
@@ -664,12 +856,9 @@ def menu():
 	menu_theme = pygame_menu.themes.THEME_BLUE.copy()
 	menu_theme.widget_font = pygame_menu.font.FONT_8BIT # Copy of blue theme with 8bit font instead
 
-	# No negative values allowed
-	valid_chars = ['1','2','3','4','5','6','7','8','9','0']
-
 	# -------------------------------------------------------------------------
-    # Create menus: AI Options menu
-    # -------------------------------------------------------------------------
+	# Create menus: AI Options menu
+	# -------------------------------------------------------------------------
 	options = pygame_menu.Menu(
 		800, # Height
 		500, #Width
@@ -677,6 +866,10 @@ def menu():
 		onclose=pygame_menu.events.EXIT, # Menu close button or ESC pressed
 		theme=menu_theme # Theme
 	)
+
+	# No negative values allowed
+	valid_chars = ['1','2','3','4','5','6','7','8','9','0']
+
 	# Integer Inputs
 	options.add_text_input(
 		'Generations : ',
@@ -693,12 +886,13 @@ def menu():
 		maxchar=2, 
 		onchange=set_val_pop
 	)
+
 	# Back Button
 	options.add_button('Back', pygame_menu.events.BACK)
 
 	# -------------------------------------------------------------------------
-    # Create menus: Main menu
-    # -------------------------------------------------------------------------
+	# Create menus: Main menu
+	# -------------------------------------------------------------------------
 	menu = pygame_menu.Menu(
 		800, 
 		500, 
@@ -706,14 +900,17 @@ def menu():
 		theme=menu_theme, 
 		onclose=pygame_menu.events.EXIT
 	)
+
 	# Play Buttons
 	menu.add_button('AI', start_AI)
 	menu.add_button('YOU', main_human)
+
 	# Spacing
 	menu.add_label('')
 	menu.add_label('')
 	menu.add_label('')
 	menu.add_label('')
+
 	# Options and Quit
 	menu.add_button('AI Options', options)
 	menu.add_button('Quit', pygame_menu.events.EXIT)
