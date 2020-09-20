@@ -5,7 +5,7 @@ def conf_file_modify(pop):
 
     config_file.write("[NEAT]\n")
     config_file.write("fitness_criterion     = max\n")
-    config_file.write("fitness_threshold     = 30\n")
+    config_file.write("fitness_threshold     = 50\n")
     config_file.write("pop_size              = " + str(pop) + "\n")
     config_file.write("reset_on_extinction   = False\n\n")
 

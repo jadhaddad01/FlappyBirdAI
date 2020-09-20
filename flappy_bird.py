@@ -349,29 +349,24 @@ def draw_window_ai(win, birds, pipes, base, score, gen, birds_alive, genomes, co
 	# Update the Current Display
 	pygame.display.update()
 
-def main_ai(genomes, config):
+def neural_network_visualizer(genome, config):
 	"""
-	Play game for AI
+	Download and process given neural network into a display-ready image
 
-	:param genomes: use different neural networks to play the game
-	:type genomes: neat.Population[]
+	:param genomes: chosen genome to be visualized
+	:type genomes: neat.Population
 
-	:param config: use different neural networks to play the game
+	:param config: configuration of the genome to be visualized
 	:type config: neat.ConfigParameter
 
 	:return: None
 	"""
 
-	# Global Variables
-	global FPS
-	global gen
+	# Global Variable
 	global neural_net_image
-	
-	# -------------------------------------------------------------------------
-	# AI Systen: Neural Network Display
-	# -------------------------------------------------------------------------
+
 	node_names = {0: 'Jump', -1: 'Bottom P', -2: 'Top P', -3: 'Bird'}
-	visualize.draw_net(config, genomes[0][1], False, fmt='png', filename='best_neural_net', node_names=node_names) # We take the first genome as we can only visualize one neural net
+	visualize.draw_net(config, genome, False, fmt='png', filename='best_neural_net', node_names=node_names)
 	
 	img = Image.open('best_neural_net.png')
 	img = img.convert("RGBA")
@@ -390,6 +385,29 @@ def main_ai(genomes, config):
 	
 	# To Display is Ready
 	neural_net_image = pygame.image.load('best_neural_net.png') 
+
+def main_ai(genomes, config):
+	"""
+	Play game for AI
+
+	:param genomes: use different neural networks to play the game
+	:type genomes: neat.Population[]
+
+	:param config: use different neural networks to play the game
+	:type config: neat.ConfigParameter
+
+	:return: None
+	"""
+
+	# Global Variables
+	global FPS
+	global gen
+	global neural_net_image
+
+	# -------------------------------------------------------------------------
+	# AI Systen: Neural Network Display
+	# -------------------------------------------------------------------------
+	neural_network_visualizer(genomes[0][1], config)
 
 	# Set Birds "Connected" To Its Genome and NN
 	nets = []
@@ -411,6 +429,9 @@ def main_ai(genomes, config):
 	# Reset Score and Add One Gen
 	score = 0
 	gen += 1
+
+	# Draw Neural Net Once
+	ge_save = ge[0]
 
 	# -------------------------------------------------------------------------
 	# Game: Main Game
@@ -472,6 +493,13 @@ def main_ai(genomes, config):
 					nets.pop(x)
 					ge.pop(x)
 
+					# -------------------------------------------------------------------------
+					# AI Systen: Neural Network Display
+					# -------------------------------------------------------------------------
+					if ge != [] and ge[0] != ge_save:
+						neural_network_visualizer(ge[0], config)
+						ge_save = ge[0]
+
 				if not pipe.passed and pipe.x < bird.x:
 					pipe.passed = True
 					add_pipe = True
@@ -508,6 +536,13 @@ def main_ai(genomes, config):
 				birds.pop(x)
 				nets.pop(x)
 				ge.pop(x)
+
+				# -------------------------------------------------------------------------
+				# AI Systen: Neural Network Display
+				# -------------------------------------------------------------------------
+				if ge != [] and ge[0] != ge_save:
+					neural_network_visualizer(ge[0], config)
+					ge_save = ge[0]
 
 		# Animate Base
 		base.move()
