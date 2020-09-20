@@ -25,8 +25,8 @@ def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
     stdev_fitness = np.array(statistics.get_fitness_stdev())
 
     plt.plot(generation, avg_fitness, 'b-', label="average")
-    plt.plot(generation, avg_fitness - stdev_fitness, 'g-.', label="-1 sd")
-    plt.plot(generation, avg_fitness + stdev_fitness, 'g-.', label="+1 sd")
+    # plt.plot(generation, avg_fitness - stdev_fitness, 'g-.', label="-1 sd")
+    # plt.plot(generation, avg_fitness + stdev_fitness, 'g-.', label="+1 sd")
     plt.plot(generation, best_fitness, 'r-', label="best")
 
     plt.title("Population's average and best fitness")
@@ -194,7 +194,7 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
             b = node_names.get(output, str(output))
             style = 'solid' if cg.enabled else 'dotted'
             color = 'green' if cg.weight > 0 else 'red'
-            width = str(1 + abs(cg.weight))
+            # width = str(1 + abs(cg.weight))
             width = str(5 * (0.1 + abs(cg.weight / 5.0)))
             dot.edge(a, b, _attributes={'style': style, 'color': color, 'penwidth': width})
 

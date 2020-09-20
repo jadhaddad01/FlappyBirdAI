@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Author: Jad Haddad
 
@@ -84,6 +83,7 @@ hs_genopt_popopt = [0, 5, 5] # Default if file not found
 try:
 	with open(os.path.join("utils", "hs_genopt_popopt.txt"), "rb") as fp:			# Load Pickle
 		hs_genopt_popopt = pickle.load(fp)
+
 # If Not Found, Create a New One
 except Exception as e:
 	print("Saved Values File hs_genopt_popopt.txt Not Found. Defaulting to:")
@@ -119,19 +119,36 @@ BG_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bg.png
 
 # Load Fonts
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
+STAT_FONT_SMALL = pygame.font.SysFont("comicsans", 30)
 STAT_FONT_BIG = pygame.font.SysFont("comicsans", 100)
 
 # -----------------------------------------------------------------------------
 # Classes
 # -----------------------------------------------------------------------------
 class Bird:
-	random_color = random.randrange(1, 4) - 1
-	IMGS = BIRD_IMGS[random_color]
+	"""
+	Bird which can jump, move, or be drawn in the screen
+	"""
+
+	# Constants
 	MAX_ROTATION = 25
 	ROT_VEL = 20
 	ANIMATION_TIME = 5
 
 	def __init__(self, x, y):
+		"""
+		Initialize bird with x y coordinates
+
+		:param x: x coordinate of pygame screen
+		:type x: dynamic (int, float)
+
+		:param y: y coordinate of pygame screen
+		:type y: dynamic (int, float)
+
+		:return: None
+		"""
+
+		# Basic Class Variables
 		self.x = x
 		self.y = y
 		self.tilt = 0
@@ -140,16 +157,32 @@ class Bird:
 		self.height = self.y
 		self.img_count = 0
 
-		self.random_color = random.randrange(1, 4) - 1
+		# Choose Random Color
+		self.random_color = random.randrange(0, 3)
 		self.IMGS = BIRD_IMGS[self.random_color]
 		self.img = self.IMGS[0]
 
 	def jump(self):
+		"""
+		Change variables for jump
+		Function move() should be called to implement the jump
+
+		:return: None
+		"""
+
+		# Variables Modification
 		self.vel = -10.5
 		self.tick_count = 0
 		self.height = self.y
 
 	def move(self):
+		"""
+		Move bird through screen for jump or for gravity
+
+		:return: None
+		"""
+
+		# Movement
 		self.tick_count += 1
 
 		d = self.vel*self.tick_count + 1.5*self.tick_count**2
@@ -162,6 +195,7 @@ class Bird:
 
 		self.y = self.y + d
 
+		# Tilt
 		if d < 0 or self.y < self.height + 50:
 			if self.tilt < self.MAX_ROTATION:
 				self.tilt = self.MAX_ROTATION
@@ -171,6 +205,16 @@ class Bird:
 				self.tilt -= self.ROT_VEL
 
 	def draw(self, win):
+		"""
+		Draw bird onto screen
+
+		:param win: window to draw on
+		:type win: UI.Window
+
+		:return: None
+		"""
+
+		# Wings Flapping
 		self.img_count += 1
 
 		if self.img_count < self.ANIMATION_TIME:
@@ -185,22 +229,46 @@ class Bird:
 			self.img = self.IMGS[0]
 			self.img_count = 0
 
+		# Falling Bird Without Flapping
 		if self.tilt <= -80:
 			self.img = self.IMGS[1]
 			self.img_count = self.ANIMATION_TIME*2
 
+		# Draw To Screen
 		rotated_image = pygame.transform.rotate(self.img, self.tilt)
 		new_rect = rotated_image.get_rect(center=self.img.get_rect(topleft = (self.x, self.y)).center)
 		win.blit(rotated_image, new_rect.topleft)
 
 	def get_mask(self):
+		"""
+		Get pixels that aren't background
+
+		:return: bird's mask
+		:type: pygame.Mask
+		"""
+
 		return pygame.mask.from_surface(self.img)
 
 class Pipe:
+	"""
+	Pipe which can be placed in a random height, moved, drawn in the screen, and check collision with bird
+	"""
+
+	# Constants
 	GAP = 200
 	VEL = 5
 
 	def __init__(self, x):
+		"""
+		Initialize pipe with x coordinate
+
+		:param x: x coordinate of pygame screen
+		:type x: dynamic (int, float)
+
+		:return: None
+		"""
+
+		# Basic Class Variables
 		self.x = x
 		self.height = 0
 		self.gap = 100
@@ -208,33 +276,72 @@ class Pipe:
 		self.top = 0
 		self.bottom = 0
 
+		# Choose Random Color
 		random_color = random.randrange(1, 3) - 1
 		self.PIPE_TOP = pygame.transform.flip(PIPE_IMGS[random_color], False, True)
 		self.PIPE_BOTTOM = PIPE_IMGS[random_color]
 
+		# Bird Passed Pipe
 		self.passed = False
+
+		# Choose Random Height
 		self.set_height()
 
 	def set_height(self):
+		"""
+		Randomize pipe height
+
+		:return: None
+		"""
+
+		# Basic Class Variables
 		self.height = random.randrange(50, 450)
 		self.top = self.height - self.PIPE_TOP.get_height()
-		self.bottom = self.height + self.GAP
+		self.bottom = self.height + self.GAP # Always have the same gap for each pipe
 
 	def move(self):
+		"""
+		Move pipe through screen
+
+		:return: None
+		"""
+
 		self.x -= self.VEL
 
 	def draw(self, win):
+		"""
+		Draw pipe onto screen
+
+		:param win: window to draw on
+		:type win: UI.Window
+
+		:return: None
+		"""
+
 		win.blit(self.PIPE_TOP, (self.x, self.top))
 		win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
 
 	def collide(self, bird):
+		"""
+		Check if collided with bird
+
+		:param bird: bird to check collision
+		:type bird: Bird
+
+		:return: if the bird collided with the pipe or not
+		:type: bool
+		"""
+
+		# Masks
 		bird_mask = bird.get_mask()
 		top_mask = pygame.mask.from_surface(self.PIPE_TOP)
 		bottom_mask = pygame.mask.from_surface(self.PIPE_BOTTOM)
 
+		# Offsets
 		top_offset = (self.x - bird.x, self.top - round(bird.y))
 		bottom_offset = (self.x - bird.x, self.bottom - round(bird.y))
 
+		# Overlaps
 		b_point = bird_mask.overlap(bottom_mask, bottom_offset) #returns None if not overlapped
 		t_point = bird_mask.overlap(top_mask, top_offset)
 
@@ -244,19 +351,40 @@ class Pipe:
 		return False
 
 class Base:
+	"""
+	Base which can be moved and drawn in the screen
+	"""
+
 	VEL = 5 #Has to be same as pipe
 	WIDTH = BASE_IMG.get_width()
 	IMG = BASE_IMG
 
 	def __init__(self, y):
+		"""
+		Initialize base with y coordinate
+
+		:param y: y coordinate of pygame screen
+		:type y: dynamic (int, float)
+
+		:return: None
+		"""
+
 		self.y = y
 		self.x1 = 0
 		self.x2 = self.WIDTH
 
 	def move(self):
+		"""
+		Move base through screen
+
+		:return: None
+		"""
+
+		# Two Bases Looping Through Screen
 		self.x1 -= self.VEL
 		self.x2 -= self.VEL
 
+		# When Outside of Screen Go Back
 		if self.x1 + self.WIDTH < 0:
 			self.x1 = self.x2 + self.WIDTH
 
@@ -264,6 +392,15 @@ class Base:
 			self.x2 = self.x1 + self.WIDTH
 
 	def draw(self, win):
+		"""
+		Draw base onto screen
+
+		:param win: window to draw on
+		:type win: UI.Window
+
+		:return: None
+		"""
+
 		win.blit(self.IMG, (self.x1, self.y))
 		win.blit(self.IMG, (self.x2, self.y))
 
@@ -303,6 +440,7 @@ def draw_window_ai(win, birds, pipes, base, score, gen, birds_alive, genomes, co
 
 	:return: None
 	"""
+
 	# Draw Background
 	win.blit(BG_IMG, (0,0))
 
@@ -342,6 +480,10 @@ def draw_window_ai(win, birds, pipes, base, score, gen, birds_alive, genomes, co
 	base.draw(win)
 	for bird in birds:
 		bird.draw(win)
+
+	# Draw Top Neural Network
+	text = STAT_FONT_SMALL.render("Best NN: ", 1, (255, 255, 255))
+	win.blit(text, (10, WIN_HEIGHT - 70 - neural_net_image.get_height() - text.get_height()))
 
 	# Draw Neural Network
 	win.blit(neural_net_image, (10, WIN_HEIGHT - 70 - neural_net_image.get_height())) # 70 accounts for base
@@ -496,7 +638,7 @@ def main_ai(genomes, config):
 					# -------------------------------------------------------------------------
 					# AI Systen: Neural Network Display
 					# -------------------------------------------------------------------------
-					if ge != [] and ge[0] != ge_save:
+					if ge != [] and ge[0] != ge_save: # Visualize new alive bird
 						neural_network_visualizer(ge[0], config)
 						ge_save = ge[0]
 
@@ -540,7 +682,7 @@ def main_ai(genomes, config):
 				# -------------------------------------------------------------------------
 				# AI Systen: Neural Network Display
 				# -------------------------------------------------------------------------
-				if ge != [] and ge[0] != ge_save:
+				if ge != [] and ge[0] != ge_save: # Visualize new alive bird
 					neural_network_visualizer(ge[0], config)
 					ge_save = ge[0]
 
@@ -823,6 +965,7 @@ def run(config_path):
 def start_AI():
 	"""
 	Prepare the artificial intelligence by resetting and setting values and the configuration
+
 	:return: None
 	"""
 
