@@ -1,0 +1,21 @@
+# FlappyBirdAI/flappy_bird.py: 41
+Pillow == 6.2.2
+
+# FlappyBirdAI/utils/visualize.py: 9
+graphviz == 0.14.1
+
+# FlappyBirdAI/utils/visualize.py: 10
+matplotlib == 3.3.1
+
+# FlappyBirdAI/flappy_bird.py: 35
+neat_python == 0.92
+
+# FlappyBirdAI/utils/visualize.py: 11
+numpy == 1.17.4
+
+# FlappyBirdAI/flappy_bird.py: 34
+# FlappyBirdAI/utils/UI.py: 6
+pygame == 1.9.6
+
+# FlappyBirdAI/flappy_bird.py: 39
+pygame_menu == 3.1.4

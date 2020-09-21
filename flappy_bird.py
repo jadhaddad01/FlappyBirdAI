@@ -48,6 +48,11 @@ from utils import UI, visualize, confmodif
 pygame.init()
 pygame.font.init()
 
+# Caption and Icon
+pygame.display.set_caption("Flappy Bird AI")
+icon = pygame.image.load(os.path.join("imgs", "flappy.ico"))
+pygame.display.set_icon(icon)
+
 # -----------------------------------------------------------------------------
 # Constants and global variables
 # -----------------------------------------------------------------------------

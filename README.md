@@ -5,9 +5,7 @@ Using the NEAT Genetic Neural Network Architecture to train a set of birds to pl
 - [Description](#desc)
 - [Usage Guide](#inst)
   * [Tutorial](#tuto)
-  * [Dependencies](#depd)
   * [Installation](#inst1)
-  * [Running Program](#runp)
 - [Architecture](#arch)
   * [Neural Network](#nnar)
   * [Activation Function](#acfn)
@@ -34,35 +32,18 @@ The user can also play the game. The high-score of the user is also saved, even 
 **Click below for the tutorial**
 [![Watch the video](https://img.youtube.com/vi/8hMP5crzj6c/maxresdefault.jpg)](https://youtu.be/8hMP5crzj6c)-->
 
-<a name="depd"></a>
-### Dependencies
-- Can run on Windows, Mac, or Linux.
-- Install pip (python) and make sure it can run in your terminal.
-- Run each line through your terminal to satisfy each library needed:
-```
-pip install pygame
-pip install neat-python
-pip install pygame-menu
-pip install Pillow
-pip install graphviz
-pip install matplotlib
-pip install numpy
-```
 <a name="inst1"></a>
-### Installation Guide
-1. Clone repository to your system OR press code -> Download ZIP.
-2. If download as ZIP, extract FlappyBirdAI-master.zip and access the extracted folder.
-
-<a name="runp"></a>
-### Running the Program
-1. Make sure you have followed the [Installation Guide](#inst1).
-2. Open terminal and cd into the extracted folder's path.
-3. Run flappy-bird.py
+### Installation
+1. Requirements: Python 3.5+ (64-bit)
+2. Run below lines in your terminal
 
 Terminal:
 ```
-cd ../FlappyBirdAI-master
-python "flappy_bird.py"
+$ cd ../FlappyBirdAI-master
+
+$ pip3 install -r requirements.txt
+
+$ python3 flappy_bird.py
 ```
 
 <a name="arch"></a>
