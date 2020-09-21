@@ -68,11 +68,13 @@ python "flappy_bird.py"
 ### Neural Network
 - The Neural Network only starts with connected input and output layers as shown below.
 - Hidden layers, biases and weights are then added. substracted, and modified as needed, (hence the Augmenting Topologies in NEAT)
+
 ![alt text](https://github.com/jadhaddad01/FlappyBirdAI/blob/master/imgs/nnarch.png)
 
 <a name="acfn"></a>
 ### Activation Function
 The used [activation function](https://en.wikipedia.org/wiki/Activation_function) in this neural network is the TanH, where if an output of more than 0.5 is calculated, the bird jumps
+
 ![alt text](https://github.com/jadhaddad01/FlappyBirdAI/blob/master/imgs/activation-tanh.png)
 
 <a name="cont"></a>
