@@ -19,7 +19,7 @@ Using the NEAT Genetic Neural Network Architecture to train a set of birds to pl
 
 This project was made using only the Python programming language. 
 
-Using the open-source NeuroEvolution of Augmenting Topologies (NEAT) library in python, we can train an Artificial Intelligence through a reward/punishement system to learn to play the popular game Flappy Bird. 
+Using the open-source [NeuroEvolution of Augmenting Topologies (NEAT)](https://neat-python.readthedocs.io/en/latest/) library in python, we can train an Artificial Intelligence through a reward/punishement system to learn to play the popular game Flappy Bird. 
 
 The user can choose the population number of birds, to try different architectures of neural networks at the same time, and also the generation number, which determines how many times the AI plays the game, training itself after each generation to play better. (Generation and population option is saved after one game is played using these options)
 
