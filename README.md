@@ -7,6 +7,7 @@ Using the NEAT Genetic Neural Network Architecture to train a set of birds to pl
   * [Installation](#inst1)
   * [Playing Game](#plgm)
   * [In-Game Information](#gmin)
+  * [AI Output Visualization](#aiov)
 - [Architecture](#arch)
   * [Neural Network](#nnar)
   * [Activation Function](#acfn)
@@ -27,7 +28,6 @@ The user can also play the game. The high-score of the user is also saved, even 
 
 <a name="inst"></a>
 ## Usage Guide
-
 <a name="inst1"></a>
 ### Installation
 1. Requirements: Python 3.5+ (64-bit)
@@ -39,23 +39,31 @@ The user can also play the game. The high-score of the user is also saved, even 
 
 <a name="plgm"></a>
 ### Playing Game
-
 |             | User        | AI                                                                          |
 | :---------: | :---------: | :---------:                                                                 |
 |             | ![][user]   |![][ai]                                                                      |
-| Options     | None        | <ol><li><strong>Population:</strong> How many birds to train each generation at the same time</li><li><strong>Generations:</strong> How many times the AI will try the game again after all birds die</li></ol> |
+| **Options**     | None        | <ol><li><strong>Population:</strong> How many birds to train each generation at the same time</li><li><strong>Generations:</strong> How many times the AI will try the game again after all birds die</li></ol> |
 
 <a name="gmin"></a>
 ### In-Game Information
-
-| User        | AI                                                                          |
-| :---------: | :---------:                                                                 |
+| User        | AI          |
+| :---------: | :---------: |
 | <ul><li><strong>Score: </strong>How many times the user passed a pipe</li><li><strong>High Score: </strong>Highest score the user got since playing the game</li></ul>        | <ul><li><strong>Score: </strong>How many times the AI passed a pipe</li><li><strong>Gen: </strong>Which generation the AI is currently playing in</li><li><strong>Alive: </strong>How many birds are still playing the game</li><li><strong>Best NN: </strong>Visualized neural network of one of the birds that are still alive </li></ul> |
+
+<a name="aiov"></a>
+### AI Output Visualization
+Output will be in the same folder **../FlappyBirdAI-master**.
+For explanation on used terms, refer to [Neural Network Architecture](#nnar)
+| File Name        | Demo          | Explanation          |
+| :---------:      | :---------:   | :---------:          | 
+| best_neural_net.png | ![][bnn]   | <ul>The best neural network throughout all generations</li><li><strong>If</strong> the user quits before all generations end, it shows the best neural network for the last generation played</li></ul> |
+| avg_fitness.svg | ![][avft] | Model of the best bird in terms of fitness in each generation, and the average of all birds |
+| speciation.svg | ![][spct] | Shows the population per species throughout the generations |
+
 
 
 <a name="arch"></a>
 ## Architecture
-
 <a name="nnar"></a>
 ### Neural Network
 - The Neural Network only starts with connected input and output layers as shown below.
@@ -82,6 +90,10 @@ This project is licensed under the GPL-3.0 License. [License Details](../master/
 [user]: ./imgs/user.gif 
 [ai]: ./imgs/ai.gif 
 [installation]: ./imgs/installation.gif 
+
+[bnn]: ./imgs/best_neural_net.png
+[avft]: ./imgs/avg_fitness.svg
+[spct]: ./imgs/speciation.svg
 
 [neuralnet]: ./imgs/nnarch.png
 [activation]: ./imgs/activation-tanh.png
