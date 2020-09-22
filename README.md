@@ -5,6 +5,7 @@ Using the NEAT Genetic Neural Network Architecture to train a set of birds to pl
 - [Description](#desc)
 - [Usage Guide](#inst)
   * [Installation](#inst1)
+  * [Playing Game](#plgm)
 - [Architecture](#arch)
   * [Neural Network](#nnar)
   * [Activation Function](#acfn)
@@ -31,10 +32,18 @@ The user can also play the game. The high-score of the user is also saved, even 
 1. Requirements: Python 3.5+ (64-bit)
 2. Run below lines in your terminal
 
-| Terminal                       | Demo |
+| Terminal | Demo |
 | :---------: | :---------: |
 | <code>$ cd ../FlappyBirdAI-master</code><br><br><code>$ pip3 install -r requirements.txt</code><br><br><code>$ python3 flappy_bird.py</code> |![][installation]|
 
+<a name="plgm"></a>
+### Playing Game
+1. Requirements: Python 3.5+ (64-bit)
+2. Run below lines in your terminal
+
+| User | AI |
+| :---------: | :---------: |
+| ![][user] |![][ai]|
 
 <a name="arch"></a>
 ## Architecture
@@ -60,6 +69,8 @@ The used [activation function](https://en.wikipedia.org/wiki/Activation_function
 ## License
 This project is licensed under the GPL-3.0 License. [License Details](../master/LICENSE)
 
+[user]: ./imgs/user.gif 
+[ai]: ./imgs/ai.gif 
 [installation]: ./imgs/installation.gif 
 
 [neuralnet]: ./imgs/nnarch.png
