@@ -6,6 +6,7 @@ Using the NEAT Genetic Neural Network Architecture to train a set of birds to pl
 - [Usage Guide](#inst)
   * [Installation](#inst1)
   * [Playing Game](#plgm)
+  * [In-Game Information](#gmin)
 - [Architecture](#arch)
   * [Neural Network](#nnar)
   * [Activation Function](#acfn)
@@ -34,11 +35,7 @@ The user can also play the game. The high-score of the user is also saved, even 
 
 | Terminal                              | Demo            |
 | :---------:                           | :---------:     |
-| <code>$ cd ../FlappyBirdAI-master</code>
-  <br><br>
-  <code>$ pip3 install -r requirements.txt</code>
-  <br><br>
-  <code>$ python3 flappy_bird.py</code> |![][installation]|
+| <code>$ cd ../FlappyBirdAI-master</code><br><br><code>$ pip3 install -r requirements.txt</code><br><br><code>$ python3 flappy_bird.py</code> |![][installation]|
 
 <a name="plgm"></a>
 ### Playing Game
@@ -48,12 +45,13 @@ The user can also play the game. The high-score of the user is also saved, even 
 |             | ![][user]   |![][ai]                                                                      |
 | Options     | None        | <ol><li><strong>Population:</strong> How many birds to train each generation at the same time</li><li><strong>Generations:</strong> How many times the AI will try the game again after all birds die</li></ol> |
 
-<ol>
-<li>First item</li>
-<li>Second item</li>
-<li>Third item</li>
-<li>Fourth item</li>
-</ol>
+<a name="gmin"></a>
+### In-Game Information
+
+| User        | AI                                                                          |
+| :---------: | :---------:                                                                 |
+| <ul><li><strong>Score: </strong>How many times the user passed a pipe</li><li><strong>High Score: </strong>Highest score the user got since playing the game</li></ul>        | <ul><li><strong>Score: </strong>How many times the AI passed a pipe</li><li><strong>Gen: </strong>Which generation the AI is currently playing in</li><li><strong>Alive: </strong>How many birds are still playing the game</li><li><strong>Best NN: </strong>Visualized neural network of one of the birds that are still alive </li></ul> |
+
 
 <a name="arch"></a>
 ## Architecture
@@ -61,7 +59,9 @@ The user can also play the game. The high-score of the user is also saved, even 
 <a name="nnar"></a>
 ### Neural Network
 - The Neural Network only starts with connected input and output layers as shown below.
-- Hidden layers, biases and weights are then added. substracted, and modified as needed, (hence the Augmenting Topologies in NEAT)
+- Hidden layers, bias neurons, and weights are then added. substracted, and modified **as needed**, (hence the Augmenting Topologies in NEAT).
+- Each bird is different from the other. Bird **species** is defined when birds possess different base architectures of nodes connected to one another. Birds of the same species only have different values for their weight connections.
+- Bird **fitness** is measured by score and distance. By trying to maximize fitness, the neural network changes it's architecture each generation to fulfill that goal.
 
 ![][neuralnet]
 
