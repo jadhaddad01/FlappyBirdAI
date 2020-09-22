@@ -33,7 +33,7 @@ The user can also play the game. The high-score of the user is also saved, even 
 
 | Terminal | Demo |
 | :----: | :--: |
-| <code>$ cd ../FlappyBirdAI-master<br><br>$ pip3 install -r requirements.txt<br><br>$ python3 flappy_bird.py</code> |![][installation]|
+| <code>$ cd ../FlappyBirdAI-master</br></br>$ pip3 install -r requirements.txt<br><br>$ python3 flappy_bird.py</code> |![][installation]|
 
 
 <a name="arch"></a>
