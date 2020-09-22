@@ -56,7 +56,7 @@ Output will be in the same folder **../FlappyBirdAI-master**.
 For explanation on used terms, refer to [Neural Network Architecture](#nnar)
 | File Name        | Demo          | Explanation          |
 | :---------:      | :---------:   | :---------:          | 
-| best_neural_net.png | ![][bnn]   | <ul><li>The best neural network throughout all generations</li><li><strong>If</strong> the user quits before all generations end, it shows the best neural network for the last generation played</li></ul> |
+| best_neural_net.png | ![][bnn]   | <ul><li>The best neural network throughout all generations</li><li><strong>If</strong> the user quits before all generations end, it shows the best neural network for the last generation played</li><li><ul><li>Green Connection: positive weight</li><li>Red Connection: negative weight</li><li>Ditted Connected: disabled connection</li></ul></li></ul> |
 | avg_fitness.svg | ![][avft] | Model of the best bird in terms of fitness in each generation, and the average of all birds |
 | speciation.svg | ![][spct] | Shows the population per species throughout the generations |
 
