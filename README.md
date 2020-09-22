@@ -4,7 +4,6 @@ Using the NEAT Genetic Neural Network Architecture to train a set of birds to pl
 #### Table of Contents 
 - [Description](#desc)
 - [Usage Guide](#inst)
-  * [Tutorial](#tuto)
   * [Installation](#inst1)
 - [Architecture](#arch)
   * [Neural Network](#nnar)
@@ -27,24 +26,15 @@ The user can also play the game. The high-score of the user is also saved, even 
 <a name="inst"></a>
 ## Usage Guide
 
-<!--<a name="tuto"></a>
-### Tutorial
-**Click below for the tutorial**
-[![Watch the video](https://img.youtube.com/vi/8hMP5crzj6c/maxresdefault.jpg)](https://youtu.be/8hMP5crzj6c)-->
-
 <a name="inst1"></a>
 ### Installation
 1. Requirements: Python 3.5+ (64-bit)
 2. Run below lines in your terminal
 
-Terminal:
-```
-$ cd ../FlappyBirdAI-master
+| Terminal | Demo |
+| :----: | :--: |
+| <code>$ cd ../FlappyBirdAI-master<br><br>$ pip3 install -r requirements.txt<br><br>$ python3 flappy_bird.py</code> |![][installation]|
 
-$ pip3 install -r requirements.txt
-
-$ python3 flappy_bird.py
-```
 
 <a name="arch"></a>
 ## Architecture
@@ -54,13 +44,13 @@ $ python3 flappy_bird.py
 - The Neural Network only starts with connected input and output layers as shown below.
 - Hidden layers, biases and weights are then added. substracted, and modified as needed, (hence the Augmenting Topologies in NEAT)
 
-![alt text](https://github.com/jadhaddad01/FlappyBirdAI/blob/master/imgs/nnarch.png)
+![][neuralnet]
 
 <a name="acfn"></a>
 ### Activation Function
 The used [activation function](https://en.wikipedia.org/wiki/Activation_function) in this neural network is the TanH, where if an output of more than 0.5 is calculated, the bird jumps
 
-![alt text](https://github.com/jadhaddad01/FlappyBirdAI/blob/master/imgs/activation-tanh.png)
+![][activation]
 
 <a name="cont"></a>
 ## Contributors
@@ -69,3 +59,8 @@ The used [activation function](https://en.wikipedia.org/wiki/Activation_function
 <a name="lics"></a>
 ## License
 This project is licensed under the GPL-3.0 License. [License Details](../master/LICENSE)
+
+[installation]: ./imgs/installation.gif
+
+[neuralnet]: ./imgs/nnarch.png
+[activation]: ./imgs/activation-tanh.png
