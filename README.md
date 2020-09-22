@@ -32,7 +32,7 @@ The user can also play the game. The high-score of the user is also saved, even 
 2. Run below lines in your terminal
 
 | Terminal | Demo |
-| :---------: | :--: |
+| :---------: | :---------: |
 | <code>$ cd ../FlappyBirdAI-master</code><br><br><code>$ pip3 install -r requirements.txt</code><br><br><code>$ python3 flappy_bird.py</code> |![][installation]|
 
 
@@ -60,7 +60,7 @@ The used [activation function](https://en.wikipedia.org/wiki/Activation_function
 ## License
 This project is licensed under the GPL-3.0 License. [License Details](../master/LICENSE)
 
-[installation]: ./imgs/installation.gif
+[installation]: ./imgs/installation.gif 
 
 [neuralnet]: ./imgs/nnarch.png
 [activation]: ./imgs/activation-tanh.png
