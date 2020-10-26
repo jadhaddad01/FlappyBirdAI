@@ -39,9 +39,9 @@ The user can also play the game. The high-score of the user is also saved, even 
 
 <a name="plgm"></a>
 ### Playing Game
-|             | User        | AI                                                                          |
-| :---------: | :---------: | :---------:                                                                 |
-|             | ![][user]   |![][ai]                                                                      |
+|             | User        | AI          |
+| :---------: | :---------: | :---------: |
+|             | ![][user]   |![][ai]      |
 | **Options**     | None        | <ol><li><strong>Population:</strong> How many birds to train each generation at the same time</li><li><strong>Generations:</strong> How many times the AI will try the game again after all birds die</li></ol> |
 
 <a name="gmin"></a>
