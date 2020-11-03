@@ -37,10 +37,12 @@ SOFTWARE.
 # Import libraries
 # -----------------------------------------------------------------------------
 # Public Libraries
+import os
+import math
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 import neat
 import time
-import os
 import random
 import pygame_menu
 import pickle
@@ -943,6 +945,9 @@ def run(config_path):
 	with open(os.path.join("utils", "hs_genopt_popopt.txt"), "wb") as fp:			# Save Pickle
 		pickle.dump(hs_genopt_popopt, fp)
 
+	# Reset Gen Count
+	gen = 0
+
 	# Run Up to [Gen. Option] Generations
 	winner = p.run(main_ai, hs_genopt_popopt[1]) # We Save Best Genome
 
@@ -969,9 +974,6 @@ def run(config_path):
 	p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-' + str(x - 1))
 	p.run(main_ai, 2)
 	"""
-
-	# Reset Gen Count
-	gen = 0
 
 def start_AI():
 	"""
