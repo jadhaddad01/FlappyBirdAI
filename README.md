@@ -1,4 +1,7 @@
 # FlappyBirdAI
+
+PYGAME MENU LIBRARY FAILED AND/OR IS OUTDATED. FOR THIS REASON BY DEFAULT ONLY THE AI WILL RUN FOR SHOWCASE.
+
 Using the NEAT Genetic Neural Network Architecture to train a set of birds to play the popular game Flappy Bird. Also playable by user.
 
 #### Table of Contents 
