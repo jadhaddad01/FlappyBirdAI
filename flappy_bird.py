@@ -473,21 +473,22 @@ def draw_window_ai(win, birds, pipes, base, score, gen, birds_alive, genomes, co
 	text = STAT_FONT.render("Alive: " + str(birds_alive), 1, (255, 255, 255))
 	win.blit(text, (10, 50))
 
-	# Return To Menu if Menu Button Pressed
-	if button2.update():
-		# Save last iteration
-		node_names = {0: 'Jump', -1: 'Bottom Pipe Height', -2: 'Top Pipe Height', -3: 'Bird Height'}
-		visualize.draw_net(config, genomes[0][1], False, fmt='png', filename='best_neural_net', node_names=node_names)
+	# PYGAME MENU FAIL
+	# # Return To Menu if Menu Button Pressed
+	# if button2.update():
+	# 	# Save last iteration
+	# 	node_names = {0: 'Jump', -1: 'Bottom Pipe Height', -2: 'Top Pipe Height', -3: 'Bird Height'}
+	# 	visualize.draw_net(config, genomes[0][1], False, fmt='png', filename='best_neural_net', node_names=node_names)
 		
-		# Remove Special Vis Files
-		try:
-			os.remove('speciation.svg')
-			os.remove('avg_fitness.svg')
-		except Exception as e:
-			pass
+	# 	# Remove Special Vis Files
+	# 	try:
+	# 		os.remove('speciation.svg')
+	# 		os.remove('avg_fitness.svg')
+	# 	except Exception as e:
+	# 		pass
 		
-		# Go Back To Menu
-		menu()
+	# 	# Go Back To Menu
+	# 	menu()
 
 	# Draw Base and Birds
 	base.draw(win)
